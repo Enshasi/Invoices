@@ -1,0 +1,117 @@
+//...............................................
+ - create model , controller , migration
+
+ 1 - php artisan make:model invoices -mcr
+
+ //...............................................
+ php artisan migrate
+
+
+
+
+---- create mail
+1 - php artisan make:notification addInvoice
+2 -
+
+///
+----Eexcel = > export
+
+
+1- xampp/php/php.ini/;extension=gd
+//extension=gd  =نشيل الفاصله بس
+
+
+
+2 - composer require psr/simple-cache:^2.0 maatwebsite/excel
+    - //بنحط الروابط في الكلاسات (providers , aliases)
+          1-config/app.php =>     'providers' => [Maatwebsite\Excel\ExcelServiceProvider::class,]
+          2-config/app.php => 'aliases' => ['Excel' => Maatwebsite\Excel\Facades\Excel::class,]
+
+3- php artisan vendor:publish --provider="Maatwebsite\Excel\ExcelServiceProvider" --tag=config
+
+
+
+4 -  php artisan make:export InvoicesExport --model=invoices
+
+5 -     -- Model Invoices
+        public function export()
+        {
+            return Excel::download(new InvoicesExport, 'users.xlsx');
+        }
+
+
+
+7 - Route::get('exportInvoices/', 'App\Http\Controllers\InvoicesController@export');
+
+
+//................................................................
+#permission
+
+1  - composer require spatie/laravel-permission
+2  -  composer require laravelcollective/html
+
+3-   - config->app.php  ===         'providers'[  Spatie\Permission\PermissionServiceProvider::class,
+                                    Collective\Html\HtmlServiceProvider::class,]
+
+     - config/app.php => 'aliases' =>  ['Form' => Collective\HTML\FromFacade::class,
+                                      'Html' => Collective\HTML\HtmlFacade::class,]
+
+4 - php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
+
+5 - php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="migrations"
+
+6 - php artisan config:clear
+
+7 -  php artisan migrate
+
+8- copy Page User
+
+ 9 - Kernel.php = >     protected $routeMiddleware = [ 'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
+                        'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,  ]
+
+10 - web =>
+                        Route::group(['middleware' => ['auth']], function() {
+
+                            Route::resource('roles','RoleController');
+                            Route::resource('users','UserController');
+
+                        });
+
+
+
+11-  php artisan make:controller UserController
+
+12 - add Text in page UserController
+
+13 - php artisan make:controller RoleController
+
+14- create controller (user , roles )
+15 -view -> Folder -> user and roles
+
+15 -php artisan make:seeder PermissionTableSeeder
+16 - add text in seeder PermissionTableSeeder
+
+15 -php artisan make:seeder CreateAdminUserSeeder
+
+16 - php artisan migrate:fresh
+
+17 - php artisan db:seed --class=PermissionTableSeeder
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+عمل المخططات عن طريق مكتبة  //
+1 - composer require fx3costa/laravelchartjs
+2 -config/App/provid Fx3costa\LaravelChartJs\Providers\ChartjsServiceProvider::class
+
+////////////////////////////////////////////////////////////////////////////////
+//notifications
+
+
+
+
+ 1 - php artisan notifications:table
+ 2 - php artisan migrate
+ 3-  php artisan make:notification Add_invoice_new
+
+
